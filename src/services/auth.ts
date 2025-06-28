@@ -24,6 +24,7 @@ export const authService = {
     // If user was created successfully, create their profile
     if (authData.user) {
       const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=49bbbd&color=fff`
+      const now = new Date().toISOString()
       
       const { error: profileError } = await supabase
         .from('profiles')
@@ -32,7 +33,9 @@ export const authService = {
           full_name: fullName,
           avatar_url: avatarUrl,
           points: 0,
-          level: 'New Member'
+          level: 'New Member',
+          created_at: now,
+          updated_at: now
         })
 
       if (profileError) {
