@@ -5,7 +5,7 @@ import { Card, CardContent } from "../../components/ui/card";
 import { Checkbox } from "../../components/ui/checkbox";
 import { Input } from "../../components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
-import { useAuth } from "../../contexts/AuthContext";
+import { useManualAuth } from "../../contexts/ManualAuthContext";
 import { useToast } from "../../components/ui/toast";
 
 interface LoginProps {
@@ -37,7 +37,7 @@ export const Login = ({ onLoginSuccess, onAdminLogin, onBackToLanding, defaultTa
   
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const { login, register } = useAuth();
+  const { login, register } = useManualAuth();
   const { addToast } = useToast();
 
   const validateLoginForm = () => {

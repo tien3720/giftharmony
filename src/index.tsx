@@ -26,8 +26,8 @@ import {
   ReviewManagement
 } from "./pages/Admin";
 import { CartProvider } from "./contexts/CartContext";
-import { AuthProvider } from "./contexts/AuthContext";
-import { WishlistProvider } from "./contexts/WishlistContext";
+import { ManualAuthProvider } from "./contexts/ManualAuthContext";
+import { WishlistProvider } from "./contexts/WishlistProvider";
 import { ToastProvider } from "./components/ui/toast";
 import { Screen } from "./types";
 
@@ -356,7 +356,7 @@ function App() {
   };
 
   return (
-    <AuthProvider onRequireLogin={handleRequireLogin}>
+    <ManualAuthProvider onRequireLogin={handleRequireLogin}>
       <CartProvider>
         <WishlistProvider>
           <ToastProvider>
@@ -364,7 +364,7 @@ function App() {
           </ToastProvider>
         </WishlistProvider>
       </CartProvider>
-    </AuthProvider>
+    </ManualAuthProvider>
   );
 }
 

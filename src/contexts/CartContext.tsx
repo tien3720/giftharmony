@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { cartService, type CartItemWithProduct } from '../services/cart';
-import { useAuth } from './AuthContext';
+import { useManualAuth } from './ManualAuthContext';
 
 export interface CartItem {
   id: string;
@@ -43,19 +42,7 @@ interface CartProviderProps {
 export const CartProvider = ({ children }: CartProviderProps) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, isAuthenticated } = useAuth();
-
-  const convertCartItem = (item: CartItemWithProduct): CartItem => ({
-    id: item.product.id,
-    name: item.product.name,
-    price: item.product.price,
-    originalPrice: item.product.original_price || undefined,
-    image: item.product.images[0] || '',
-    quantity: item.quantity,
-    category: item.product.category?.name || '',
-    inStock: item.product.stock_count > 0,
-    maxQuantity: item.product.max_quantity
-  });
+  const { user, isAuthenticated } = useManualAuth();
 
   const refreshCart = async () => {
     if (!user) {
@@ -63,14 +50,10 @@ export const CartProvider = ({ children }: CartProviderProps) => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const cartItems = await cartService.getCartItems(user.id);
-      setItems(cartItems.map(convertCartItem));
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-    } finally {
-      setIsLoading(false);
+    // For now, use localStorage to store cart
+    const stored = localStorage.getItem(`cart_${user.id}`);
+    if (stored) {
+      setItems(JSON.parse(stored));
     }
   };
 
@@ -82,12 +65,31 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     }
   }, [isAuthenticated, user]);
 
+  const saveCart = (cartItems: CartItem[]) => {
+    if (user) {
+      localStorage.setItem(`cart_${user.id}`, JSON.stringify(cartItems));
+    }
+  };
+
   const addToCart = async (product: Omit<CartItem, 'quantity'>, quantity = 1) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
-      await cartService.addToCart(user.id, product.id, quantity);
-      await refreshCart();
+      const existingItemIndex = items.findIndex(item => item.id === product.id);
+      
+      if (existingItemIndex >= 0) {
+        // Update existing item
+        const newItems = [...items];
+        newItems[existingItemIndex].quantity += quantity;
+        setItems(newItems);
+        saveCart(newItems);
+      } else {
+        // Add new item
+        const newItem: CartItem = { ...product, quantity };
+        const newItems = [...items, newItem];
+        setItems(newItems);
+        saveCart(newItems);
+      }
     } catch (error) {
       console.error('Error adding to cart:', error);
       throw error;
@@ -98,8 +100,9 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
-      await cartService.removeFromCart(user.id, productId);
-      await refreshCart();
+      const newItems = items.filter(item => item.id !== productId);
+      setItems(newItems);
+      saveCart(newItems);
     } catch (error) {
       console.error('Error removing from cart:', error);
       throw error;
@@ -110,8 +113,16 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
-      await cartService.updateCartItem(user.id, productId, quantity);
-      await refreshCart();
+      if (quantity <= 0) {
+        await removeFromCart(productId);
+        return;
+      }
+
+      const newItems = items.map(item => 
+        item.id === productId ? { ...item, quantity } : item
+      );
+      setItems(newItems);
+      saveCart(newItems);
     } catch (error) {
       console.error('Error updating cart:', error);
       throw error;
@@ -122,8 +133,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
-      await cartService.clearCart(user.id);
       setItems([]);
+      localStorage.removeItem(`cart_${user.id}`);
     } catch (error) {
       console.error('Error clearing cart:', error);
       throw error;

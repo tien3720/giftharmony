@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { wishlistService } from '../services/wishlist';
-import { useAuth } from './AuthContext';
+import { useManualAuth } from './ManualAuthContext';
 
 interface WishlistContextType {
   wishlistItems: string[];
@@ -30,7 +29,7 @@ interface WishlistProviderProps {
 export const WishlistProvider = ({ children }: WishlistProviderProps) => {
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useManualAuth();
 
   const refreshWishlist = async () => {
     if (!user) {
@@ -38,14 +37,10 @@ export const WishlistProvider = ({ children }: WishlistProviderProps) => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const items = await wishlistService.getWishlist(user.id);
-      setWishlistItems(items.map(item => item.product_id));
-    } catch (error) {
-      console.error('Error fetching wishlist:', error);
-    } finally {
-      setIsLoading(false);
+    // For now, use localStorage to store wishlist
+    const stored = localStorage.getItem(`wishlist_${user.id}`);
+    if (stored) {
+      setWishlistItems(JSON.parse(stored));
     }
   };
 
@@ -61,8 +56,9 @@ export const WishlistProvider = ({ children }: WishlistProviderProps) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
-      await wishlistService.addToWishlist(user.id, productId);
-      setWishlistItems(prev => [...prev, productId]);
+      const newItems = [...wishlistItems, productId];
+      setWishlistItems(newItems);
+      localStorage.setItem(`wishlist_${user.id}`, JSON.stringify(newItems));
     } catch (error) {
       console.error('Error adding to wishlist:', error);
       throw error;
@@ -73,8 +69,9 @@ export const WishlistProvider = ({ children }: WishlistProviderProps) => {
     if (!user) throw new Error('User not authenticated');
 
     try {
-      await wishlistService.removeFromWishlist(user.id, productId);
-      setWishlistItems(prev => prev.filter(id => id !== productId));
+      const newItems = wishlistItems.filter(id => id !== productId);
+      setWishlistItems(newItems);
+      localStorage.setItem(`wishlist_${user.id}`, JSON.stringify(newItems));
     } catch (error) {
       console.error('Error removing from wishlist:', error);
       throw error;
