@@ -13,19 +13,36 @@ export interface AuthUser {
 export const authService = {
   // Sign up with email and password
   async signUp(email: string, password: string, fullName: string) {
-    const { data, error } = await supabase.auth.signUp({
+    // First, create the auth user without metadata
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=49bbbd&color=fff`
-        }
-      }
+      password
     })
 
-    if (error) throw error
-    return data
+    if (authError) throw authError
+
+    // If user was created successfully, create their profile
+    if (authData.user) {
+      const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=49bbbd&color=fff`
+      
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          id: authData.user.id,
+          full_name: fullName,
+          avatar_url: avatarUrl,
+          points: 0,
+          level: 'New Member'
+        })
+
+      if (profileError) {
+        // If profile creation fails, we should clean up the auth user
+        // But since we can't delete auth users from client, we'll just throw the error
+        throw new Error(`Profile creation failed: ${profileError.message}`)
+      }
+    }
+
+    return authData
   },
 
   // Sign in with email and password
