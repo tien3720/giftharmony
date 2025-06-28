@@ -20,7 +20,7 @@ export const manualAuthService = {
       .from('manual_users')
       .select('email')
       .eq('email', email)
-      .single()
+      .maybeSingle()
 
     if (existingUser) {
       throw new Error('Email đã được sử dụng')

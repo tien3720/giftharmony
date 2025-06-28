@@ -3,7 +3,7 @@ import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Star, Package, Heart, S
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
-import { useAuth } from '../../contexts/AuthContext';
+import { useManualAuth } from '../../contexts/ManualAuthContext';
 import { useToast } from '../../components/ui/toast';
 
 interface ProfileProps {
@@ -26,12 +26,12 @@ interface UserProfile {
 }
 
 export const Profile = ({ onBack, onViewSettings, onViewOrderHistory, onViewWishlist }: ProfileProps): JSX.Element => {
-  const { user } = useAuth();
+  const { user } = useManualAuth();
   const { addToast } = useToast();
   
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState<UserProfile>({
-    fullName: user?.name || '',
+    fullName: user?.full_name || '',
     email: user?.email || '',
     phone: '0901234567',
     address: '123 Nguyễn Văn Linh',
@@ -125,7 +125,7 @@ export const Profile = ({ onBack, onViewSettings, onViewOrderHistory, onViewWish
     setErrors({});
     // Reset form to original values
     setProfile({
-      fullName: user?.name || '',
+      fullName: user?.full_name || '',
       email: user?.email || '',
       phone: '0901234567',
       address: '123 Nguyễn Văn Linh',
@@ -182,8 +182,8 @@ export const Profile = ({ onBack, onViewSettings, onViewOrderHistory, onViewWish
                   <div className="relative">
                     <div className="w-24 h-24 rounded-full overflow-hidden bg-gray-100">
                       <img
-                        src={user?.avatar}
-                        alt={user?.name}
+                        src={user?.avatar_url}
+                        alt={user?.full_name}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -197,7 +197,7 @@ export const Profile = ({ onBack, onViewSettings, onViewOrderHistory, onViewWish
                   </div>
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-900 font-['Poppins',Helvetica]">
-                      {user?.name}
+                      {user?.full_name}
                     </h2>
                     <p className="text-gray-600">{user?.email}</p>
                     <div className="flex items-center mt-2">

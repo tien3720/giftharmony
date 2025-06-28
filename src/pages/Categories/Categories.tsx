@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { ProductCard, EmptyState, LoadingSpinner } from '../../components/common';
 import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useManualAuth } from '../../contexts/ManualAuthContext';
 import { useToast } from '../../components/ui/toast';
 import { FEATURED_PRODUCTS } from '../../data/mockData';
 import { CATEGORIES } from '../../constants';
@@ -24,7 +24,7 @@ export const Categories = ({ onBack, onViewProduct, onViewCart, selectedCategory
   const [isLoading, setIsLoading] = useState(false);
 
   const { addToCart } = useCart();
-  const { requireAuth } = useAuth();
+  const { requireAuth } = useManualAuth();
   const { addToast } = useToast();
 
   // Filter products by category

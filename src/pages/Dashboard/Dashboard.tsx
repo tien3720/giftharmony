@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Header } from '../../components/layout';
 import { ProductCard, LoadingSpinner } from '../../components/common';
 import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useManualAuth } from '../../contexts/ManualAuthContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useToast } from '../../components/ui/toast';
 import { useProducts, useCategories } from '../../hooks/useProducts';
@@ -43,7 +43,7 @@ export const Dashboard = ({
   const [isLoadingFeatured, setIsLoadingFeatured] = useState(true);
   
   const { getTotalItems, addToCart } = useCart();
-  const { user, logout, requireAuth } = useAuth();
+  const { user, logout, requireAuth } = useManualAuth();
   const { toggleWishlist, isInWishlist, getWishlistCount } = useWishlist();
   const { addToast } = useToast();
   const { categories } = useCategories();

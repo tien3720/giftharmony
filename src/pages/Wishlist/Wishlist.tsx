@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { EmptyState, ProductCard } from '../../components/common';
 import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useManualAuth } from '../../contexts/ManualAuthContext';
 import { useWishlist } from '../../contexts/WishlistContext';
 import { useToast } from '../../components/ui/toast';
 import { FEATURED_PRODUCTS } from '../../data/mockData';
@@ -20,7 +20,7 @@ export const Wishlist = ({ onBack, onViewProduct, onViewCart }: WishlistProps): 
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   
   const { addToCart } = useCart();
-  const { requireAuth } = useAuth();
+  const { requireAuth } = useManualAuth();
   const { wishlistItems, removeFromWishlist, toggleWishlist, isInWishlist } = useWishlist();
   const { addToast } = useToast();
 

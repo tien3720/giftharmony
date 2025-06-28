@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Input } from '../../components/ui/input';
 import { ProductCard, EmptyState, LoadingSpinner } from '../../components/common';
 import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useManualAuth } from '../../contexts/ManualAuthContext';
 import { useToast } from '../../components/ui/toast';
 import { useDebounce } from '../../hooks/useDebounce';
 import { FEATURED_PRODUCTS } from '../../data/mockData';
@@ -42,7 +42,7 @@ export const Search = ({ onBack, onViewProduct, onViewCart, initialQuery = '' }:
   });
 
   const { addToCart } = useCart();
-  const { requireAuth } = useAuth();
+  const { requireAuth } = useManualAuth();
   const { addToast } = useToast();
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 

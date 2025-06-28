@@ -4,7 +4,7 @@ import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useManualAuth } from '../../contexts/ManualAuthContext';
 import { useToast } from '../../components/ui/toast';
 
 interface CheckoutProps {
@@ -32,11 +32,11 @@ interface PaymentMethod {
 
 export const Checkout = ({ onBack, onOrderComplete }: CheckoutProps): JSX.Element => {
   const { items, getTotalPrice, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user } = useManualAuth();
   const { addToast } = useToast();
 
   const [shippingInfo, setShippingInfo] = useState<ShippingInfo>({
-    fullName: user?.name || '',
+    fullName: user?.full_name || '',
     phone: '',
     email: user?.email || '',
     address: '',
