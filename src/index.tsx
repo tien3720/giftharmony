@@ -27,7 +27,7 @@ import {
 } from "./pages/Admin";
 import { CartProvider } from "./contexts/CartContext";
 import { ManualAuthProvider } from "./contexts/ManualAuthContext";
-import { WishlistProvider } from "./contexts/WishlistProvider";
+import { WishlistProvider } from "./contexts/WishlistContext";
 import { ToastProvider } from "./components/ui/toast";
 import { Screen } from "./types";
 
